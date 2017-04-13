@@ -166,13 +166,13 @@ void CChopStickDetectView::OnRButtonUp(UINT /* nFlags */, CPoint point)
 {
 	if (g.RectState)
 	{
+		CRect rt;
+		GetClientRect(&rt);
 		switch (g.RectState)
 		{
 		case DRAWCOLORRECT:
-			CRect rt;
-			GetClientRect(&rt);
 
-
+			break;
 		default:
 			break;
 		}

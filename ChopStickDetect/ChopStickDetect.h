@@ -29,7 +29,8 @@ class CChopStickDetectApp : public CWinAppEx
 public:
 	CChopStickDetectApp();
 
-
+public:
+	void TresholdHsv(uchar h, uchar s, uchar v);
 // ÖØÐ´
 public:
 	virtual BOOL InitInstance();
@@ -51,6 +52,7 @@ public:
 	afx_msg void OnButtonTrain();
 	afx_msg void OnButtonPredict();
 	afx_msg void OnButtonShowControl();
+	
 };
 
 extern CChopStickDetectApp theApp;

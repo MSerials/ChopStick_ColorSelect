@@ -574,6 +574,9 @@ void CPreferences::LoadParaFile(UINT item)
 		}
 		if (PARA_IMAGE == (mask&PARA_IMAGE))
 		{
+			m_h = GetValueI(L"IMAGE_SETTING", L"H");
+			m_s = GetValueI(L"IMAGE_SETTING", L"S");
+			m_v = GetValueI(L"IMAGE_SETTING", L"V");
 			m_nESCPixel = GetValueI(L"IMAGE_SETTING", L"EscPixel");
 			m_idThreshNoise = GetValueI(L"IMAGE_SETTING", L"idThreshNoise");
 			m_idOfThreshold = GetValueI(L"IMAGE_SETTING", L"idOfThreshold");
@@ -667,6 +670,9 @@ void CPreferences::SaveParaFile(UINT item)
 
 	if(PARA_IMAGE==(mask&PARA_IMAGE))
 	{
+		SetValueI(L"IMAGE_SETTING", L"H", m_h);
+		SetValueI(L"IMAGE_SETTING", L"S", m_s);
+		SetValueI(L"IMAGE_SETTING", L"V", m_v);
 		SetValueI(L"IMAGE_SETTING",L"EscPixel",m_nESCPixel);
 		SetValueI(L"IMAGE_SETTING",L"idThreshNoise",m_idThreshNoise);	//背景处理方式
 		SetValueI(L"IMAGE_SETTING",L"idOfThreshold",m_idOfThreshold);	//二值化算法选择
@@ -760,6 +766,9 @@ void CPreferences::initData()
 	m_nVoid = 0;	//统计上下左右检测到的数目和没有物品的数目	
 
 					//IMAGE #define PARA_IMAGE			(0x1<<1)
+	m_h = 50;
+	m_s = 50;
+	m_v = 50;
 	m_imageDealMode = 0; //OTSU
 	m_nESCPixel = 0;
 	m_idThreshNoise = 0;		//背景处理方式

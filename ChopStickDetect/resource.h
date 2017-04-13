@@ -42,10 +42,13 @@
 #define IDC_STATIC_VALUEH               1001
 #define IDC_STATIC_VALUES               1002
 #define IDC_STATIC_VALUEV               1003
-#define IDC_EDIT1                       1004
-#define IDC_EDIT2                       1005
-#define IDC_EDIT3                       1006
+#define IDC_EDIT_H                      1004
+#define IDC_EDIT_S                      1005
+#define IDC_EDIT_V                      1006
 #define IDC_BUTTON_SAVE                 1010
+#define IDC_BUTTON_DRAWRECT             1011
+#define IDC_BUTTON_SAVE2                1012
+#define IDC_BUTTON_TEST                 1012
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define ID_BUTTON_LOAD                  32771
 #define ID_BUTTON_TEST                  32772

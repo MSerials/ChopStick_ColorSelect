@@ -23,4 +23,7 @@ protected:
 public:
 	afx_msg void OnBnClickedButtonSave();
 	afx_msg void OnPaint();
+	virtual BOOL OnInitDialog();
+	afx_msg void OnBnClickedButtonDrawrect();
+	afx_msg void OnBnClickedButtonTest();
 };

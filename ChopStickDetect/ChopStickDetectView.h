@@ -30,6 +30,7 @@ public:
 
 // 重写
 public:
+	void iOnDraw(CDC* pDC, const cv::Mat & src);  // 重写以绘制该视图
 	virtual void OnDraw(CDC* pDC);  // 重写以绘制该视图
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 protected:
@@ -54,7 +55,7 @@ protected:
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 	DECLARE_MESSAGE_MAP()
 public:
-	void Draw();
+	void Draw(const cv::Mat& src);
 	void SetMessage(int msg = 0) { m_msg = msg; }
 private:
 	int m_msg;
@@ -70,6 +71,7 @@ public:
 
 	CMFCToolTipCtrl		   m_tooltip;
 	//virtual BOOL PreTranslateMessage(MSG* pMsg);
+	void ThresHoldHsv(uchar h, uchar s, uchar v);
 };
 
 #ifndef _DEBUG  // ChopStickDetectView.cpp 中的调试版本

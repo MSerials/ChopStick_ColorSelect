@@ -158,6 +158,7 @@ private:
 	int otsuThreshold(const Mat& mat);
 	int otsubyROI(const Mat& mat);
 	void Threshold(const Mat& mat, int threshold);
+	
 public:
 	
 private:
@@ -185,6 +186,8 @@ public:
 	bool get_Mat_depth_and_channels(const Mat& mat, int& depth, int& channels);
 	inline void swapValue(uchar& a, uchar& b);
 public:
+	void TresholdHsv(const cv::Mat & src, cv::Mat& dst, uchar h, uchar s, uchar v);
+	cv::Mat SignDefective(const cv::Mat & color, cv::Mat & gray);
 	int MatImgProcess(Mat& mat);
 	int MatImgProcess(const cv::Mat& mat, cv::Mat& dst);
 	void getWidthAndHeight(cv::Mat mat, cv::Point &pt);

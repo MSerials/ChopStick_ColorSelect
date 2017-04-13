@@ -144,6 +144,7 @@ public:
 	//IMAGE #define PARA_IMAGE			(0x1<<1)
 	CString m_front_path ;
 	CString m_back_path ;
+	int m_h, m_s, m_v;//hsv空间阈值
 	int m_imageDealMode;		//处理
 	int m_nESCPixel;
 	int m_idThreshNoise;		//背景处理方式

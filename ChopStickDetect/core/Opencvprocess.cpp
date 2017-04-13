@@ -2454,7 +2454,58 @@ float  COpencvprocess::color_predict(const cv::Mat & src)
 }
 
 
+void COpencvprocess::TresholdHsv(const cv::Mat & src, cv::Mat& dst, uchar h, uchar s, uchar v)
+{
+	if (src.empty()) return;
+	cv::Mat color,tmp;
+	if(CV_8UC3 != src.type()) cv::cvtColor(src, color, CV_GRAY2BGR);
+	else color = src.clone();
+	cv::cvtColor(color, tmp, CV_BGR2HSV_FULL);
 
+	size_t tstep = tmp.step;
+	size_t height = tmp.rows;
+	size_t width = tmp.cols;
+	cv::Mat gray(src.size(), CV_8UC1);
+	size_t gstep = gray.step;
+
+	uchar* sdata = tmp.data;
+	uchar* ddata = gray.data;
+	for (size_t h = 0; h < height; h++)
+	{
+		for (size_t w = 0; w < width; w++)
+		{
+			if ((sdata[h*tstep + 3 * w + 1] < s) &&
+				(sdata[h*tstep + 3 * w + 2] < v)
+				)
+			{
+				ddata[h*gstep + w] = 0xFF;
+			}
+			else
+			{
+				ddata[h*gstep + w] = 0x00;
+			}
+		}
+	}
+	dst = SignDefective(color,gray);
+}
+
+cv::Mat  COpencvprocess::SignDefective(const cv::Mat & color, cv::Mat & gray)
+{
+	cv::Mat t = color.clone();
+	std::vector<std::vector<cv::Point>> contours;
+	cv::Mat ero,dil;
+	cv::erode(gray, ero, Mat(), cv::Point(-1, -1), 1);
+		cv::dilate(ero, dil, Mat(), cv::Point(-1, -1), 1);
+	cv::findContours(dil, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_NONE, cvPoint(0, 0));
+	//cv::drawContours(gray, contours, -1, Scalar(255), CV_FILLED/*2*/);   // -1 表示所有轮廓
+	for (size_t c = 0; c < contours.size(); c++)
+	{
+		Moments g = moments(contours[c]);
+		circle(t,cv::Point(g.m10 / g.m00, g.m01 / g.m00),2,Scalar(0,255,0));
+	}
+	return t;
+
+}
 
 
 

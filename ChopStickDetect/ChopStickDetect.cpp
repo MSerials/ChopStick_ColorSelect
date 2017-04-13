@@ -265,7 +265,7 @@ void CChopStickDetectApp::OnButtonLoad()
 
 		CMainFrame* pMain = (CMainFrame*)AfxGetMainWnd();
 		CChopStickDetectView *view = (CChopStickDetectView*)pMain->GetActiveView();
-		view->Draw();
+		view->Draw(g.opencv.m_RawMatImg);
 	}
 	catch (...)
 	{
@@ -284,7 +284,7 @@ void CChopStickDetectApp::OnButtonTest()
 	g.opencv.m_RawMatImg = g.opencv.GetHSVData(g.opencv.m_RawMatImg, rect);
 	CMainFrame* pMain = (CMainFrame*)AfxGetMainWnd();
 	CChopStickDetectView *view = (CChopStickDetectView*)pMain->GetActiveView();
-	view->Draw();
+	view->Draw(g.opencv.m_RawMatImg);
 
 }
 
@@ -402,4 +402,14 @@ void CChopStickDetectApp::OnButtonShowControl()
 	// TODO: 在此添加命令处理程序代码
 	CMainFrame * pMF = (CMainFrame*)AfxGetMainWnd();
 	pMF->m_DockOperation.ShowPane(TRUE, FALSE, TRUE);
+}
+
+
+void CChopStickDetectApp::TresholdHsv(uchar h, uchar s, uchar v)
+{
+	cv::Mat dst;
+	g.opencv.TresholdHsv(g.opencv.m_RawMatImg,dst,h, s, v);
+	CMainFrame* pMain = (CMainFrame*)AfxGetMainWnd();
+	CChopStickDetectView *view = (CChopStickDetectView*)pMain->GetActiveView();
+	view->Draw(dst);
 }

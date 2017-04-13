@@ -77,8 +77,15 @@ BOOL CChopStickDetectView::PreCreateWindow(CREATESTRUCT& cs)
 }
 
 // CChopStickDetectView 绘制
-
 void CChopStickDetectView::OnDraw(CDC* pDC)
+{
+	CChopStickDetectDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+}
+
+void CChopStickDetectView::iOnDraw(CDC* pDC, const cv::Mat & src)
 {
 	CChopStickDetectDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -93,7 +100,7 @@ void CChopStickDetectView::OnDraw(CDC* pDC)
 	int nWndHeight = rt.bottom - rt.top;
 
 	uchar *pdata = NULL;
-	if (g.opencv.CopyMatDataToMem(g.opencv.m_RawMatImg, &pdata))
+	if (g.opencv.CopyMatDataToMem(src, &pdata))
 	{
 
 		CDC dcMem;
@@ -106,9 +113,9 @@ void CChopStickDetectView::OnDraw(CDC* pDC)
 		HDC  hDC = dcMem.GetSafeHdc();
 		::SetStretchBltMode(hDC, COLORONCOLOR);
 
-		LPBITMAPINFO pBitmapInfo = g.opencv.CreateMapInfo(g.opencv.m_RawMatImg);
-		const int height = g.opencv.m_RawMatImg.rows;
-		const int width = g.opencv.m_RawMatImg.cols;
+		LPBITMAPINFO pBitmapInfo = g.opencv.CreateMapInfo(src);
+		const int height = src.rows;
+		const int width = src.cols;
 		::StretchDIBits(hDC,
 			0,//nWndWidth,
 			0,//nWndHeight,
@@ -221,10 +228,10 @@ CChopStickDetectDoc* CChopStickDetectView::GetDocument() const // 非调试版本是内
 
 
 
-void CChopStickDetectView::Draw()
+void CChopStickDetectView::Draw(const cv::Mat& src)
 {
 	CDC *pdc = CChopStickDetectView::GetDC();
-	OnDraw(pdc);
+	iOnDraw(pdc,src);
 	ReleaseDC(pdc);
 }
 
@@ -249,7 +256,7 @@ void CChopStickDetectView::OnLButtonDown(UINT nFlags, CPoint point)
 													//SendMessage(WM_LBUTTONUP,NULL,NULL);
 		}
 		Invalidate(FALSE);
-		Draw();
+	//	Draw();
 	//	Invalidate(FALSE);   //刷新窗口区域，使得CrectTracker对象重绘到窗口上
 		CPaintDC pDC(this); // device context for painting
 		m_RectTracker.Draw(&pDC);
@@ -334,4 +341,11 @@ BOOL CChopStickDetectView::SetTipText(UINT id, NMHDR *pTTTStruct, LRESULT *pResu
 	UINT nID = pTTTStruct->idFrom;   //得到相应窗口ID，有可能是HWND   
 	return TRUE;
 
+}
+
+
+void CChopStickDetectView::ThresHoldHsv(uchar h, uchar s, uchar v)
+{
+	if (g.opencv.m_RawMatImg.empty()) return;
+	cv::Mat d;
 }

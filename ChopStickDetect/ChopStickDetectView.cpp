@@ -21,7 +21,7 @@
 
 #include "ChopStickDetectDoc.h"
 #include "ChopStickDetectView.h"
-
+#include "MainFrm.h"
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -39,6 +39,11 @@ BEGIN_MESSAGE_MAP(CChopStickDetectView, CView)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
 	ON_WM_LBUTTONDOWN()
+	ON_WM_PAINT()
+	ON_WM_MOUSEMOVE()
+
+	ON_NOTIFY_EX(TTN_NEEDTEXT,0,SetTipText)
+
 END_MESSAGE_MAP()
 
 // CChopStickDetectView 构造/析构
@@ -50,6 +55,13 @@ CChopStickDetectView::CChopStickDetectView()
 	m_RectTracker.m_nHandleSize = 10;  //手柄大小  
 	m_RectTracker.m_rect.SetRectEmpty(); // 最初的矩形   
 	m_msg = 0;
+	m_mp = L"鼠标位置";
+	m_tooltip.Create(this);
+	m_tooltip.AddTool(this, TTS_ALWAYSTIP);
+	//设定文字的颜色
+	m_tooltip.SetTipTextColor(RGB(0, 0, 255));
+	//设定提示文字在控件上停留的时间
+	m_tooltip.SetDelayTime(150);
 }
 
 CChopStickDetectView::~CChopStickDetectView()
@@ -236,3 +248,90 @@ void CChopStickDetectView::OnLButtonDown(UINT nFlags, CPoint point)
 
 	CView::OnLButtonDown(nFlags, point);
 }
+
+
+void CChopStickDetectView::OnPaint()
+{
+#if 0
+	if (IsIconic())
+	{
+		CPaintDC dc(this); // device context for painting
+
+		SendMessage(WM_ICONERASEBKGND, (WPARAM)dc.GetSafeHdc(), 0);
+
+		// Center icon in client rectangle
+		int cxIcon = GetSystemMetrics(SM_CXICON);
+		int cyIcon = GetSystemMetrics(SM_CYICON);
+		CRect rect;
+		GetClientRect(&rect);
+		int x = (rect.Width() - cxIcon + 1) / 2;
+		int y = (rect.Height() - cyIcon + 1) / 2;
+
+		// Draw the icon
+	//	dc.DrawIcon(x, y, m_hIcon);
+	}
+	else
+	{
+		CView::OnPaint();
+	}
+	//	CBrush brh(clr);
+
+	//	CPaintDC dc(this);
+	CDC *pDC = GetDC();
+	for (int i = 0; i<100; i++)
+	{
+		pDC->FillSolidRect(i, 0, 1, 100, RGB(i*2.55, 255 - i*2.55, 255));
+		pDC->FillSolidRect(100 + i, 0, 1, 100, RGB(255, i*2.55, 255 - 2.55*i));
+		pDC->FillSolidRect(200 + i, 0, 1, 100, RGB(255 - 2.55*i, 255 - i*2.55, 2.55*i));
+		pDC->FillSolidRect(300 + i, 0, 1, 100, RGB(2.55*i, 0, 255 - 2.55*i));
+		pDC->FillSolidRect(400 + i, 0, 1, 100, RGB(255 - 2.55*i, 0, 2.55*i));
+	}
+
+#endif
+	CPaintDC dc(this); // device context for painting
+					   // TODO: 在此处添加消息处理程序代码
+					   // 不为绘图消息调用 CView::OnPaint()
+}
+
+
+void CChopStickDetectView::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	HDC h = ::GetDC(m_hWnd);//当前窗口的句柄
+	COLORREF clr = COLORREF(GetPixel(h, point.x, point.y));//获取当前鼠标颜色
+	CDC *pDC = GetDC();
+	pDC->FillSolidRect(0, 0, 20, 20, clr);   //显示鼠标出的颜色 
+	uchar B = (clr & 0xFF0000) >> 16;
+	uchar G = (clr & 0xFF00) >> 8;
+	uchar R = (clr & 0xFF);
+	cv::Mat c(1, 1, CV_8UC3, Scalar(B, G, R)),d;
+	cv::cvtColor(c, d, CV_BGR2HSV_FULL);
+	uchar H = d.at<uchar>(0, 0);
+	uchar S = d.at<uchar>(0, 1);
+	uchar V = d.at<uchar>(0, 2);
+	CString str;
+	str.Format(_T("鼠标位置(%d,%d),H:%d,S:%d,V:%d"), point.x, point.y,H,S,V);
+	CMainFrame *pFrame = (CMainFrame*)AfxGetMainWnd();
+	pFrame->m_wndStatusBar.GetElement(0)->SetText(str);
+	pFrame->m_wndStatusBar.GetElement(0)->SetDescription(L"显示当前鼠标位置颜色状态");
+	pFrame->m_wndStatusBar.GetElement(0)->Redraw();
+//	pFrame->m_wndStatusBar.RedrawWindow();
+	CView::OnMouseMove(nFlags, point);
+}
+
+BOOL CChopStickDetectView::SetTipText(UINT id, NMHDR *pTTTStruct, LRESULT *pResult)
+{
+	TOOLTIPTEXT *pTTT = (TOOLTIPTEXT *)pTTTStruct;
+	UINT nID = pTTTStruct->idFrom;   //得到相应窗口ID，有可能是HWND   
+	return TRUE;
+
+}
+#if 0
+BOOL CChopStickDetectView::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	if (m_tooltip.m_hWnd != NULL)
+		m_tooltip.RelayEvent(pMsg);
+	return CView::PreTranslateMessage(pMsg);
+}
+#endif

@@ -62,6 +62,14 @@ public:
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 private:
 	CRectTracker  m_RectTracker;
+	CString m_mp;
+public:
+	afx_msg void OnPaint();
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	BOOL SetTipText(UINT id, NMHDR * pTTTStruct, LRESULT * pResult);
+
+	CMFCToolTipCtrl		   m_tooltip;
+	//virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 #ifndef _DEBUG  // ChopStickDetectView.cpp 中的调试版本

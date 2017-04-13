@@ -86,7 +86,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	ASSERT(bNameValid);
 	bNameValid = strTitlePane2.LoadString(IDS_STATUS_PANE2);
 	ASSERT(bNameValid);
-	m_wndStatusBar.AddElement(new CMFCRibbonStatusBarPane(ID_STATUSBAR_PANE1, strTitlePane1, TRUE), strTitlePane1);
+	m_wndStatusBar.AddElement(new CMFCRibbonStatusBarPane(ID_STATUSBAR_PANE1, _T("显示鼠标坐标状态和鼠标取得的颜色"), TRUE), _T("显示鼠标坐标状态和鼠标取得的颜色"));
 	m_wndStatusBar.AddExtendedElement(new CMFCRibbonStatusBarPane(ID_STATUSBAR_PANE2, strTitlePane2, TRUE), strTitlePane2);
 
 	// 启用 Visual Studio 2005 样式停靠窗口行为
@@ -96,10 +96,41 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// 基于持久值设置视觉管理器和样式
 	OnApplicationLook(theApp.m_nAppLook);
 
+
+	ModifyStyleEx(WS_EX_CLIENTEDGE, 0, SWP_FRAMECHANGED);
+	ModifyStyleEx(WS_EX_CLIENTEDGE, NULL);
+	ModifyStyleEx(WS_CAPTION, NULL);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	if (!m_DockOperation.Create(_T("控制面板"), this, CRect(0, 0, 400, 1080), TRUE, 1000, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_LEFT | CBRS_FLOAT_MULTI
+		, AFX_CBRS_REGULAR_TABS, AFX_CBRS_CLOSE | AFX_CBRS_FLOAT
+	))
+	{
+		TRACE0("Failed to create LeftPane\n");
+		return -1;
+	}
+
+	m_DockOperation.LoadState(FALSE);
+	m_DockOperation.SetAutoHideMode(FALSE, NULL, NULL, NULL);
+	m_DockOperation.EnableDocking(CBRS_ALIGN_RIGHT | CBRS_ALIGN_LEFT);
+	DockPane(&m_DockOperation);
+
 	return 0;
 }
 
-BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
+BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs) 
 {
 	if( !CFrameWndEx::PreCreateWindow(cs) )
 		return FALSE;
@@ -229,4 +260,11 @@ void CMainFrame::OnFilePrintPreview()
 void CMainFrame::OnUpdateFilePrintPreview(CCmdUI* pCmdUI)
 {
 	pCmdUI->SetCheck(IsPrintPreview());
+}
+
+
+BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	return CFrameWndEx::OnCreateClient(lpcs, pContext);
 }

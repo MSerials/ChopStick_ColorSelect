@@ -13,7 +13,7 @@
 //
 
 #pragma once
-
+#include "Operation.h"
 class CMainFrame : public CFrameWndEx
 {
 	
@@ -43,7 +43,9 @@ protected:  // 控件条嵌入成员
 	CMFCRibbonBar     m_wndRibbonBar;
 	CMFCRibbonApplicationButton m_MainButton;
 	CMFCToolBarImages m_PanelImages;
+public:
 	CMFCRibbonStatusBar  m_wndStatusBar;
+	COperation			m_DockOperation;
 
 // 生成的消息映射函数
 protected:
@@ -55,6 +57,7 @@ protected:
 	afx_msg void OnUpdateFilePrintPreview(CCmdUI* pCmdUI);
 	DECLARE_MESSAGE_MAP()
 
+	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
 };
 
 

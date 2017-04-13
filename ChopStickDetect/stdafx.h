@@ -64,9 +64,10 @@
 
 
 
+#define WMMSG_QUANTITY (USER+1000)
 
-
-
+#define NODRAWRECT		0
+#define DRAWCOLORRECT	(1<<0)
 
 
 #include "include\Preferences.h"
@@ -106,10 +107,12 @@
 class __global
 {
 public:
-	__global() { ErrorCode = 0; };
+	__global() { ErrorCode = 0; RectState = 0; }
 	~__global() {};
 	CPreferences ini;
 	COpencvprocess opencv;
+
+	int RectState;
 
 	std::vector<std::string> color_ok_images;
 	std::vector<std::string> color_ng_images;

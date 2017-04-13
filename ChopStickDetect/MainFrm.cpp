@@ -17,6 +17,7 @@
 
 #include "MainFrm.h"
 
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -97,16 +98,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	OnApplicationLook(theApp.m_nAppLook);
 
 
-	ModifyStyleEx(WS_EX_CLIENTEDGE, 0, SWP_FRAMECHANGED);
-	ModifyStyleEx(WS_EX_CLIENTEDGE, NULL);
-	ModifyStyleEx(WS_CAPTION, NULL);
-
-
-
-
-
-
-
+//	ModifyStyleEx(WS_EX_CLIENTEDGE, 0, SWP_FRAMECHANGED);
+//	ModifyStyleEx(WS_EX_CLIENTEDGE, NULL);
+//	ModifyStyleEx(WS_CAPTION, NULL);
 
 
 
@@ -121,12 +115,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		TRACE0("Failed to create LeftPane\n");
 		return -1;
 	}
-
 	m_DockOperation.LoadState(FALSE);
-	m_DockOperation.SetAutoHideMode(FALSE, NULL, NULL, NULL);
-	m_DockOperation.EnableDocking(CBRS_ALIGN_RIGHT | CBRS_ALIGN_LEFT);
+	m_DockOperation.EnableDocking(CBRS_ALIGN_LEFT | CBRS_ALIGN_RIGHT);
+	m_DockOperation.SetAutoHideMode(FALSE, CBRS_ALIGN_RIGHT, NULL, NULL);
 	DockPane(&m_DockOperation);
-
+	m_DockOperation.ShowPane(TRUE, FALSE, TRUE);
 	return 0;
 }
 

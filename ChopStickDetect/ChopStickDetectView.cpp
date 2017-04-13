@@ -164,15 +164,24 @@ void CChopStickDetectView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 
 void CChopStickDetectView::OnRButtonUp(UINT /* nFlags */, CPoint point)
 {
-	if (1 == m_msg)
+	if (g.RectState)
 	{
-		m_msg = 0;
-		CRect rt;
-		GetClientRect(&rt);
+		switch (g.RectState)
+		{
+		case DRAWCOLORRECT:
+			CRect rt;
+			GetClientRect(&rt);
+
+
+		default:
+			break;
+		}
 
 
 
 
+
+		g.RectState = NODRAWRECT;
 		return;
 	}
 	ClientToScreen(&point);
@@ -223,7 +232,7 @@ void CChopStickDetectView::Draw()
 void CChopStickDetectView::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
-	if (!m_msg) return;
+	if (!g.RectState) return;
 	CRect cwrect;
 	//GetDlgItem(IDC_STATIC_IMGCAPTURE)->GetWindowRect(&cwrect); //获取窗体中控件的区域
 	//ScreenToClient(&cwrect); //转换为相对区域的CRect  if(point.x>cwrect.left&& point.y>cwrect.top    //确保按下的坐标在控件区域内   && point.x
@@ -326,12 +335,3 @@ BOOL CChopStickDetectView::SetTipText(UINT id, NMHDR *pTTTStruct, LRESULT *pResu
 	return TRUE;
 
 }
-#if 0
-BOOL CChopStickDetectView::PreTranslateMessage(MSG* pMsg)
-{
-	// TODO: 在此添加专用代码和/或调用基类
-	if (m_tooltip.m_hWnd != NULL)
-		m_tooltip.RelayEvent(pMsg);
-	return CView::PreTranslateMessage(pMsg);
-}
-#endif

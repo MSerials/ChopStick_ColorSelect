@@ -50,6 +50,7 @@ public:
 	afx_msg void OnButtonNgExamples();
 	afx_msg void OnButtonTrain();
 	afx_msg void OnButtonPredict();
+	afx_msg void OnButtonShowControl();
 };
 
 extern CChopStickDetectApp theApp;

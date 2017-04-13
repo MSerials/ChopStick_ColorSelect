@@ -45,6 +45,7 @@ BEGIN_MESSAGE_MAP(CChopStickDetectApp, CWinAppEx)
 	ON_COMMAND(ID_BUTTON_NG_EXAMPLES, &CChopStickDetectApp::OnButtonNgExamples)
 	ON_COMMAND(ID_BUTTON_TRAIN, &CChopStickDetectApp::OnButtonTrain)
 	ON_COMMAND(ID_BUTTON_PREDICT, &CChopStickDetectApp::OnButtonPredict)
+	ON_COMMAND(ID_BUTTON_SHOW_CONTROL, &CChopStickDetectApp::OnButtonShowControl)
 END_MESSAGE_MAP()
 
 
@@ -393,4 +394,12 @@ void CChopStickDetectApp::OnButtonPredict()
 	//g.opencv.ColorInvert(g.opencv.m_RawMatImg);
 	if (g.opencv.m_RawMatImg.empty()) return;
 	g.opencv.color_predict(g.opencv.m_RawMatImg);
+}
+
+
+void CChopStickDetectApp::OnButtonShowControl()
+{
+	// TODO: 在此添加命令处理程序代码
+	CMainFrame * pMF = (CMainFrame*)AfxGetMainWnd();
+	pMF->m_DockOperation.ShowPane(TRUE, FALSE, TRUE);
 }

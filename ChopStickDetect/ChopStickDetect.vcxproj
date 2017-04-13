@@ -193,6 +193,7 @@
     <ClInclude Include="ChopStickDetectDoc.h" />
     <ClInclude Include="ChopStickDetectView.h" />
     <ClInclude Include="core\Opencvprocess.h" />
+    <ClInclude Include="Ctrl.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Operation.h" />
     <ClInclude Include="Resource.h" />
@@ -208,6 +209,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Ctrl.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="Operation.cpp" />
     <ClCompile Include="src\Preferences.cpp">

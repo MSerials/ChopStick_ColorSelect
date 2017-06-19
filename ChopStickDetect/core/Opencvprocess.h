@@ -223,6 +223,7 @@ private:
 	void delete_Mat_with_Mask(Mat& mat);
 public:
 	// 存储了处理结果的图片
+	cv::Rect m_rect;
 	
 	void get_BackGroud_Mat_img(Mat& dst);
 
@@ -280,6 +281,12 @@ public:
 
 	void exsplit(const cv::Mat src, std::vector<cv::Mat>& mv);
 
+	cv::Mat getHSVData(cv::Mat & src);
+
+	void readimg();
+
+	void svm_train();
+
 	float average_data(const cv::Mat &src);
 
 	cv::Mat GetHSVData(const cv::Mat & src, cv::Rect rect);
@@ -287,6 +294,9 @@ public:
 	Ptr<ANN_MLP> color_train(const Mat_<float> &data, const Mat_<float>& responses);
 	float color_predict(Mat_<float>& data);
 	float color_predict(const cv::Mat & src);
+	void svm_train(const std::vector<std::string>& front_images, const std::vector<std::string>& back_images);
+	float svm_predict(const cv::Mat & srct);
+	float svm_predict(const cv::Mat & src, Rect rect);
 	int ann_train(const std::vector<std::string>& front_images, const std::vector<std::string>& back_images);
 
 	bool ann_load(const String filename = "color.xml");
@@ -296,6 +306,10 @@ public:
 	cv::Rect GetROI(cv::Rect ScreenSize, cv::Rect DrawROI, cv::Rect ImgSize);
 
 	private:
+		cv::Mat traindata;// = cv::Mat();
+		cv::Mat labels;
+		Ptr<SVM> svm;
+		bool isTrained;
 		Ptr<ANN_MLP> color_network;
 		size_t winwidth;
 		size_t winheight;

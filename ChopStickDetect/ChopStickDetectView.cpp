@@ -260,6 +260,12 @@ void CChopStickDetectView::OnLButtonDown(UINT nFlags, CPoint point)
 	//	Invalidate(FALSE);   //刷新窗口区域，使得CrectTracker对象重绘到窗口上
 		CPaintDC pDC(this); // device context for painting
 		m_RectTracker.Draw(&pDC);
+		/*
+		g.opencv.m_rect.y = m_RectTracker.m_rect.top;
+		g.opencv.m_rect.x = m_RectTracker.m_rect.left;
+		g.opencv.m_rect.width = m_RectTracker.m_rect.Width();
+		g.opencv.m_rect.height = m_RectTracker.m_rect.Height();
+		*/
 	}
 
 	CView::OnLButtonDown(nFlags, point);

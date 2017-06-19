@@ -380,6 +380,13 @@ int COpencvprocess::getOtsuByMask(const Mat& src, const Mat& mask)
 COpencvprocess::COpencvprocess()
 : ImageData(NULL)
 {
+	traindata = cv::Mat();
+	svm = SVM::create();
+	svm->setType(SVM::C_SVC);
+	svm->setC(0.1);
+	svm->setKernel(SVM::LINEAR);
+	svm->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER, (int)1e7, 1e-6));
+	isTrained = false;
 	float n = 0.0, delta_ang = (float)CV_PI / 180;
 	for (int i = 0; i < 180; i++,n += delta_ang)
 	{
@@ -2318,7 +2325,52 @@ float COpencvprocess::average_data(const cv::Mat &src)
 	return static_cast<float>(average);
 }
 
+/**
+float COpencvprocess::average_data(const cv::Mat &src)
+{
+	double size = static_cast<double>(src.cols*src.rows);
+	size_t step = src.step;
+	double average = 0;
+	for (size_t h = 0; h<src.rows; ++h)
+		for (size_t w = 0; w < src.cols; ++w)
+		{
+			double d = static_cast<double>(src.data[h*step + w]);
+			average += d / size;
+		}
+	return static_cast<float>(average);
+}
 
+
+void COpencvprocess::exsplit(const cv::Mat src, std::vector<cv::Mat>& mv)
+{
+
+	size_t chs = src.channels();
+	int type = src.type();
+	for (int i = 0;; ++i)
+	{
+		int itype = src.type() - 8 * i;
+		if (itype < 0) break;
+		type = itype;
+	}
+
+	for (size_t i = 0; i < chs; ++i)
+	{
+		mv.push_back(cv::Mat(src.size(), type));
+	}
+	size_t ostep = src.step;
+	size_t step = mv[0].step;
+	//bug
+	for (size_t h = 0; h<src.rows; ++h)
+		for (size_t w = 0; w < src.cols; ++w)
+		{
+			for (size_t ch = 0; ch < chs; ++ch)
+			{
+				mv[ch].data[h*step + w] = src.data[h*ostep + chs*w + ch];
+			}
+		}
+}
+
+*/
 cv::Mat COpencvprocess::GetHSVData(const cv::Mat & src, cv::Rect rect)
 {
 	if (CV_8UC3 != src.type()) return cv::Mat();
@@ -2454,6 +2506,147 @@ float  COpencvprocess::color_predict(const cv::Mat & src)
 }
 
 
+
+
+void COpencvprocess::svm_train(const std::vector<std::string>& front_images, const std::vector<std::string>& back_images)
+{
+	size_t sample_quantity = front_images.size() + back_images.size();
+	traindata = cv::Mat(sample_quantity, 3, CV_32FC1);
+	labels = cv::Mat(sample_quantity, 1, CV_32SC1);  //having
+	if (!front_images.size() || !back_images.size()) { AfxMessageBox(L"没有获取到图片"); return; }
+
+	size_t index = 0;
+	for (size_t i = 0; i < front_images.size(); i++)
+	{
+		cv::Mat src = cv::imread(front_images[i].c_str(), -1);
+		cv::Mat data = getHSVData(src);
+		traindata.at<float>(index, 0) = data.at<float>(0, 0);
+		traindata.at<float>(index, 1) = data.at<float>(0, 1);
+		traindata.at<float>(index, 2) = data.at<float>(0, 2);
+
+		labels.at<float>(index, 0) = -1.0;
+		index++;
+	}
+
+	for (size_t i = 0; i < back_images.size(); i++)
+	{
+		cv::Mat src = cv::imread(back_images[i].c_str(), -1);
+
+		cv::Mat data = getHSVData(src);
+		traindata.at<float>(index, 0) = data.at<float>(0, 0);
+		traindata.at<float>(index, 1) = data.at<float>(0, 1);
+		traindata.at<float>(index, 2) = data.at<float>(0, 2);
+		labels.at<float>(index, 0) = 1.0;
+		index++;
+	}
+	svm->train(traindata, ROW_SAMPLE, labels);
+	isTrained = true;
+}
+
+float COpencvprocess::svm_predict(const cv::Mat& srct)
+{
+	cv::Mat rect_img = srct.clone();
+	cv::Mat data = getHSVData(rect_img);
+	if (!isTrained)  return 0.0; 
+	try {
+		return svm->predict(data);
+	}
+	catch (Ptr<SVM> & excetp)
+	{
+		AfxMessageBox(L"没有进行训练或者没有载入图片");
+	}
+}
+
+float COpencvprocess::svm_predict(const cv::Mat& src, Rect rect)
+{
+	cv::Mat rect_img;
+	src(rect).copyTo(rect_img);
+	cv::Mat data = getHSVData(rect_img);
+	return svm->predict(data);
+}
+
+
+
+void COpencvprocess::svm_train()
+{
+
+	//! [init]
+	//! [train]
+	svm->train(traindata, ROW_SAMPLE, labels);
+	//! [train]
+	std::cout << "Finished training process" << std::endl;
+
+}
+
+
+
+cv::Mat COpencvprocess::getHSVData(cv::Mat & src)
+{
+	cv::Mat rect_img, rect_hsv, color;
+	if (CV_8UC3 != src.type()) cvtColor(src, rect_img, COLOR_GRAY2BGR);
+	std::vector <cv::Mat> mv;
+	cvtColor(src, rect_hsv, COLOR_BGR2HSV_FULL);
+	exsplit(rect_hsv, mv);
+	cv::Mat avg(1, 3, CV_32FC1);
+	avg.at<float>(0, 0) = average_data(mv[0]);
+	avg.at<float>(0, 1) = average_data(mv[1]);
+	avg.at<float>(0, 2) = average_data(mv[2]);
+	return avg;
+}
+
+void COpencvprocess::readimg()
+{
+	//20 samples and 3 datas
+	traindata = cv::Mat(20, 3, CV_32FC1);
+	labels = cv::Mat(20, 1, CV_32SC1);  //having
+
+	int index = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		char path[256] = { 0 };
+		sprintf_s(path, "COLOROK/%d.png", i + 1);
+		cv::Mat src = cv::imread(path, -1);
+		namedWindow(path);
+		if (!src.empty())imshow(path, src);
+
+		cv::Mat data = getHSVData(src);
+		traindata.at<float>(index, 0) = data.at<float>(0, 0);
+		traindata.at<float>(index, 1) = data.at<float>(0, 1);
+		traindata.at<float>(index, 2) = data.at<float>(0, 2);
+
+		labels.at<float>(index, 0) = -1.0;
+		index++;
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		char path[256] = { 0 };
+		sprintf_s(path, "COLORNG/%d.png", i + 1);
+		cv::Mat src = cv::imread(path, -1);
+		namedWindow(path);
+		if (!src.empty())imshow(path, src);
+
+		cv::Mat data = getHSVData(src);
+		traindata.at<float>(index, 0) = data.at<float>(0, 0);
+		traindata.at<float>(index, 1) = data.at<float>(0, 1);
+		traindata.at<float>(index, 2) = data.at<float>(0, 2);
+
+		labels.at<float>(index, 0) = 1.0;
+		index++;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
 void COpencvprocess::TresholdHsv(const cv::Mat & src, cv::Mat& dst, uchar h, uchar s, uchar v)
 {
 	if (src.empty()) return;
@@ -2486,26 +2679,58 @@ void COpencvprocess::TresholdHsv(const cv::Mat & src, cv::Mat& dst, uchar h, uch
 			}
 		}
 	}
-	dst = SignDefective(color,gray);
+	dst = SignDefective(color,gray).clone();
 }
 
 cv::Mat  COpencvprocess::SignDefective(const cv::Mat & color, cv::Mat & gray)
 {
 	cv::Mat t = color.clone();
 	std::vector<std::vector<cv::Point>> contours;
-	cv::Mat ero,dil;
-	cv::erode(gray, ero, Mat(), cv::Point(-1, -1), 1);
-		cv::dilate(ero, dil, Mat(), cv::Point(-1, -1), 1);
-	cv::findContours(dil, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_NONE, cvPoint(0, 0));
+	cv::Mat ero,dil,bim;
+	cv::threshold(gray, bim, 128, 255, THRESH_BINARY);
+	morphologyEx(gray, dil, MORPH_CLOSE, Mat(3, 3, CV_8U), Point(-1, -1), 1);
+		
+		
+		//return dil;
+	cv::findContours(dil, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_NONE);
 	//cv::drawContours(gray, contours, -1, Scalar(255), CV_FILLED/*2*/);   // -1 表示所有轮廓
 	for (size_t c = 0; c < contours.size(); c++)
 	{
 		Moments g = moments(contours[c]);
-		circle(t,cv::Point(g.m10 / g.m00, g.m01 / g.m00),2,Scalar(0,255,0));
+		circle(t,cv::Point(g.m10 / g.m00, g.m01 / g.m00),10,Scalar(0,255,0),3);
 	}
 	return t;
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

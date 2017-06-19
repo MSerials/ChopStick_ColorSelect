@@ -360,24 +360,30 @@ void CChopStickDetectApp::OnButtonTrain()
 	cv::Mat t;
 	std::vector<CString> images;
 	win_tool::CSelectFolderDlg DirPath;
-	DirPath.ProcPicDir(App + L"\\" + g.ini.m_front_path + L"\\", images);
+	DirPath.ProcPicDir(App + L"\\COLOROK" + L"\\", images);
+
+
+	std::vector<std::string> front_images;
 	for (size_t index = 0; index < images.size(); index++)
 	{
 		std::string file = (std::string)(CStringA)images[index];
 		cout << file << endl;
 		t = cv::imread(file, -1);
-		if(!t.empty()) g.color_ok_images.push_back(file);
+		if (!t.empty()) front_images.push_back(file);
 	}
+
 	images.clear();
-	DirPath.ProcPicDir(App + L"\\" + g.ini.m_back_path, images);
+	DirPath.ProcPicDir(App + L"\\COLORNG" + L"\\", images);
+	std::vector<std::string> back_images;
 	for (size_t index = 0; index < images.size(); index++)
 	{
 		std::string file = (std::string)(CStringA)images[index];
+		cout << file << endl;
 		t = cv::imread(file, -1);
-		if (!t.empty()) g.color_ng_images.push_back(file);
+		if (!t.empty()) back_images.push_back(file);
 	}
 
-	g.opencv.ann_train(g.color_ok_images, g.color_ng_images);
+	g.opencv.svm_train(front_images, back_images);
 }
 
 
@@ -393,7 +399,10 @@ void CChopStickDetectApp::OnButtonPredict()
 
 	//g.opencv.ColorInvert(g.opencv.m_RawMatImg);
 	if (g.opencv.m_RawMatImg.empty()) return;
-	g.opencv.color_predict(g.opencv.m_RawMatImg);
+
+	CString str;
+	str.Format(L"-1表示OK， 1表示 NG    预测值为 %f", g.opencv.color_predict(g.opencv.m_RawMatImg));
+	AfxMessageBox(str);
 }
 
 

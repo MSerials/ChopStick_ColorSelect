@@ -47,8 +47,9 @@
 #define IDC_EDIT_V                      1006
 #define IDC_BUTTON_SAVE                 1010
 #define IDC_BUTTON_DRAWRECT             1011
-#define IDC_BUTTON_SAVE2                1012
 #define IDC_BUTTON_TEST                 1012
+#define IDC_BUTTON_TRAIN                1016
+#define IDC_BUTTON_PREDICT              1017
 #define ID_WRITE_PASTEASHYPERLINK       32770
 #define ID_BUTTON_LOAD                  32771
 #define ID_BUTTON_TEST                  32772

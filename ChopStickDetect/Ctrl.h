@@ -26,4 +26,6 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedButtonDrawrect();
 	afx_msg void OnBnClickedButtonTest();
+	afx_msg void OnBnClickedButtonTrain();
+	afx_msg void OnBnClickedButtonPredict();
 };
